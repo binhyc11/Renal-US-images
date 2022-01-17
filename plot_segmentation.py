@@ -52,18 +52,46 @@ col =[]
 for i in range (800):
     col.append('c' + str(i+1))
     
-
-def plot_pixel_value (row):
-    sum = np.sum(row, dtype = np.float32)
+def barplot (row_1D_array):
+    sum = np.sum(row_1D_array, dtype = np.float32)
     print (sum)
-    if sum != 0:
-        plt.bar (col, row, color ='maroon')
-        plt.ylim((0, 255))
-        plt.show()
+    plt.bar (col, row_1D_array, color ='maroon')
+    #plt.ylim((0, 255))
+    plt.show()
+
+def boxplot (array_2D):
+    array_1D =[]
+    for i in range (600):
+        for j in range (800):
+            array_1D.append(array_2D[i][j])
+    plt.figure(figsize=(10, 7))
+    plt.boxplot(array_1D)
+    plt.show()
+    return array_1D
+    
+def exp_value (array_2D):
+    exp = np.multiply(array_2D, array_2D)
+    return exp
+
+def delete_markers (ROI):
+    _, _, mean = overview(ROI)
+    for i in range (600):
+        for j in range (800):
+            if ROI[i][j] >= 230:
+                ROI[i][j] = mean
+    return ROI
+def overview (ROI):
+    num_pixel = 0
+    total_value_pixel = 0
+    for i in range (600):
+        for j in range (800):
+            if ROI[i][j] > 0:
+                num_pixel += 1
+                total_value_pixel += ROI[i][j]
+    mean_value_pixel = total_value_pixel/num_pixel
+    return num_pixel, total_value_pixel, mean_value_pixel
         
-# Total = []
-# for i in range (600):
-#     sum = np.sum(seg[i], dtype = np.float32)
+
     
         
         
