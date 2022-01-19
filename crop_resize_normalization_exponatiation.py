@@ -85,8 +85,10 @@ def delete_markers(ROI):  # return roi without markers
 
 
 def cut_border(contour, roi):  # return mask_array with border cut
+    upper = contour[0][0]
+    lower = contour[-1][0]
     for con in contour:
-        for i in range(roi.shape[0]):
+        for i in range(upper, lower+1):
             for j in range(roi.shape[1]):
                 temp = (i - con[0])**2 + (j - con[1])**2
                 if temp > 0 and temp <= 900:  # size of eraser
