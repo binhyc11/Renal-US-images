@@ -130,8 +130,8 @@ def resize(roi):  # return roi resized to (350, 600)
         dims = (600, (roi.shape[0] * 600) // roi.shape[1])
     else:
         dims = ((350 * roi.shape[1]) // roi.shape[0], 350)
-    roi = cv2.resize(roi, dsize=dims, interpolation=cv2.INTER_NEAREST)
-    return roi
+    roi2 = cv2.resize(roi, dsize=dims, interpolation=cv2.INTER_NEAREST)
+    return roi2
 
 
 root = 'D:/renalUS/U55/'
