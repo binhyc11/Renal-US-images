@@ -111,14 +111,28 @@ def border_medulla(contour, roi):# return roi for no border, medulla for medulla
     Return: roi: roi from Input with border cut
             medulla: a (600, 800) array contains medulla
     '''
+    upper = contour[0][0]
+    lower = upper
+    left = contour[0][1]
+    right = left
+    for i in range(len(contour)):
+        if contour[i][1] > right:
+            right = contour[i][1]
+        if contour[i][1] < left:
+            left = contour[i][1]
+        if contour[i][0] > lower:
+            lower = contour[i][0]
+        if contour[i][0] < upper:
+            upper = contour[i][0]
+    
     medulla = copy.deepcopy(roi)
     for con in contour:
-        for i in range(roi.shape[0]):
-            for j in range(roi.shape[1]):
+        for i in range(upper, lower + 1):
+            for j in range(left, right +1):
                 temp = (i - con[0])**2 + (j - con[1])**2
-                if temp > 0 and (temp <= 900):  # for cutting border
+                if temp > 0 and (temp <= 500):  # for cutting border
                     roi[i][j] = 0
-                if temp > 0 and (temp <= 12000):  # for medulla
+                if temp > 0 and (temp <= 6000):  # for medulla
                     medulla[i][j] = 0
     return roi, medulla
 
@@ -172,14 +186,10 @@ for i in range(len(a)):
     
     roi, mask = segmentation(a[i], b[i])
     print ('step %s.1' %i)
-    plt.imshow(roi)
-    plt.show()
     
     roi_no_marker = delete_markers(roi)
     print ('step %s.2' %i)
-    plt.imshow(roi_no_marker)
-    plt.show()
-        
+
     contour_roi_no_marker = find_contour(roi_no_marker)
     print ('step %s.3' %i)
         
@@ -195,23 +205,16 @@ for i in range(len(a)):
 
     roi_crop = crop(roi_no_border, contour_roi_no_border)
     print ('step %s.6' %i)
-    plt.imshow(roi_crop)
-    plt.show()
-    
+
     roi_resize = resizing(roi_crop)
     print ('step %s.7' %i)
-    plt.imshow(roi_resize)
-    plt.show()
-    
+
     mean_medulla = overview (medulla)
     print ('step %s.10' %i)    
     
-        
     roi_nor = roi_resize * 255.0 / mean_medulla # normalized roi
     print ('step %s.11' %i)
-    plt.imshow(roi_nor)
-    plt.show()
-    
+
     roi_exp = np.multiply(roi_nor, roi_nor)
     print ('step %s.12' %i)
     plt.imshow(roi_exp)
