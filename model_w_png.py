@@ -64,7 +64,8 @@ def run_test():
     history = model.fit(train_it, steps_per_epoch=(len(train_it)),
                                   validation_data=test_it,
                                   validation_steps = len(test_it),
-                                  epochs = 500
+                                  epochs = 500,
+                                  callbacks=[WandbCallback()],
                                   )
     _, acc = model.evaluate(test_it, steps=len(test_it), verbose =0)
     print ('%.3f' % (acc * 100.0))
