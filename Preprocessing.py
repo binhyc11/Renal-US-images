@@ -183,7 +183,7 @@ root = 'D:/renalUS/B65/'
 a, b = path(root)
 small = []
 
-for i in range (418, len(a)): 
+for i in range (len(a)): 
         start = timeit.default_timer()
         
         roi, mask = segmentation(a[i], b[i])
