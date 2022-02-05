@@ -9,7 +9,8 @@ from wandb.keras import WandbCallback
 
 
 wandb.init (project = "RenalUS", entity="binhyc11")
-
+model_callback = ModelCheckpoint (filepath='D:/model/2_layers.h5', save_weights_only=False,
+                                  monitor='val_loss', mode='min', save_best_only=True)
 
 def define_model():
     model = Sequential()
@@ -97,7 +98,7 @@ def run_test_vgg19():
                                   validation_data=test_it,
                                   validation_steps = len(test_it),
                                   epochs = 500,
-                                  callbacks=[WandbCallback()]
+                                  callbacks=[WandbCallback(), model_callback]
                                   )
     _, acc = model.evaluate(test_it, steps=len(test_it), verbose =0)
     print ('%.3f' % (acc * 100.0))
