@@ -179,9 +179,10 @@ def exp_value(array_2D):  # return exponential array
     exp = np.multiply(array_2D, array_2D)
     return exp
 
-root = 'D:/renalUS/B65/'
+root = 'D:/external/'
 a, b = path(root)
 small = []
+new_shape = (350, 600)
 
 for i in range (len(a)): 
         start = timeit.default_timer()
@@ -220,10 +221,16 @@ for i in range (len(a)):
         
             roi_exp = np.multiply(roi_nor, roi_nor)
             print ('step %s.10' %i)
-            plt.imshow(roi_exp)
-            plt.show()
             
-            save ('D:/renalUS/np_B65/%s.npy' %i, roi_exp)
+            shape_diff = np.array(new_shape) - np.array(roi_exp.shape)
+            new_roi_exp = np.lib.pad(roi_exp, ((0,shape_diff[0]),(0,shape_diff[1])), 
+                              'constant', constant_values=(0))
+
+            plt.imshow(new_roi_exp, cmap="gray")
+            plt.axis('off')
+            plt.savefig('D:/ext2/%s' %a[i][12:20] + '_%s.png' %i, bbox_inches='tight',pad_inches = 0)
+            
+            
             stop = timeit.default_timer()
             print ('FINAL STEPPPPP of %s' %i, 'with time:', stop-start)
 print (small)
