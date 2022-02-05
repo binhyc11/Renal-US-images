@@ -10,19 +10,17 @@ def path(directory):  # return dcm_list, nrrd_list
     Return: List of .dcm paths and .nrrd path
     '''
     dcm_list, nrrd_list = [], []
-    path = os.listdir(directory)
-    for i in path:
-        IDs = os.listdir(directory + i)
-        for ID in IDs:
-            files = os.listdir(directory + '/'  + ID)
-            for file in files:
-                f_name, file_ext = os.path.splitext(file)
-                if file_ext == '.nrrd':
-                    path_nrrd = directory + ID + '/' + file
-                    name_dcm = f_name[0] + '.dcm'
-                    path_dcm = directory + ID + '/' + name_dcm
-                    nrrd_list.append(path_nrrd)
-                    dcm_list.append(path_dcm)
+    IDs = os.listdir(directory)
+    for ID in IDs:
+        files = os.listdir(directory + ID)
+        for file in files:
+            f_name, file_ext = os.path.splitext(file)
+            if file_ext == '.nrrd':
+                path_nrrd = directory + ID + '/' + file
+                name_dcm = f_name[0] + '.dcm'
+                path_dcm = directory  + ID + '/' + name_dcm
+                nrrd_list.append(path_nrrd)
+                dcm_list.append(path_dcm)
     return dcm_list, nrrd_list
 
 def segmentation(path_dcm, path_nrrd):  # return ROI, mask_array
@@ -44,7 +42,7 @@ def segmentation(path_dcm, path_nrrd):  # return ROI, mask_array
 
     # nrrd --> array  --> transposing
     mask_array, _ = nrrd.read(path_nrrd)
-    mask_array = np.reshape(mask_array, (mask_array.shape[1], mask_array.shape[0]))
+    mask_array = np.reshape(mask_array, (mask_array.shape[0], mask_array.shape[1]))
     mask_array = np.transpose(mask_array).astype (float)
 
     # apply nrrd to dcm in array type
@@ -186,7 +184,7 @@ a, b = path(root)
 
 small = []
 
-for i in range (418, len(a)): 
+for i in range (len(a)): 
         
         roi, mask = segmentation(a[i], b[i])
         print ('step %s.1' %i)
@@ -225,7 +223,7 @@ for i in range (418, len(a)):
             plt.imshow(roi_exp)
             plt.show()
             
-            save ('D:/np_exp/%s.npy' %i, roi_exp)
+            save ('D:/np_ext/%s.npy' %i, roi_exp)
 
             print ('FINAL STEPPPPP of %s' %i)
 print (small)
