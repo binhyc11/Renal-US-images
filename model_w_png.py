@@ -66,10 +66,11 @@ def run_test():
                                   validation_data=test_it,
                                   validation_steps = len(test_it),
                                   epochs = 500,
-                                  callbacks=[WandbCallback()],
+                                  callbacks=[WandbCallback(),  model_callback],
                                   )
     _, acc = model.evaluate(test_it, steps=len(test_it), verbose =0)
     print ('%.3f' % (acc * 100.0))
+    model.save ('D:/2_layers.h5')
 
 
 def run_test_vgg19():
