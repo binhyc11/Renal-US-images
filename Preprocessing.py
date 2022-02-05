@@ -42,7 +42,7 @@ def segmentation(path_dcm, path_nrrd):  # return ROI, mask_array
 
     # nrrd --> array  --> transposing
     mask_array, _ = nrrd.read(path_nrrd)
-    mask_array = np.reshape(mask_array, (mask_array.shape[1], mask_array.shape[0]))
+    mask_array = np.reshape(mask_array, (mask_array.shape[0], mask_array.shape[1]))
     mask_array = np.transpose(mask_array).astype (float)
 
     # apply nrrd to dcm in array type
