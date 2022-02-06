@@ -132,7 +132,7 @@ def border_medulla(contour, roi):# return roi for no border, medulla for medulla
                 temp = (i - con[0])**2 + (j - con[1])**2
                 if temp > 0 and (temp <= 900):  # for cutting border
                     roi[i][j] = 0
-                if temp > 0 and (temp <= 10000):  # for medulla
+                if temp > 0 and (temp <= 6400):  # for medulla
                     medulla[i][j] = 0
     return roi, medulla
 
@@ -179,9 +179,9 @@ def exp_value(array_2D):  # return exponential array
     exp = np.multiply(array_2D, array_2D)
     return exp
 
-root = 'D:/ext/'
+root = 'D:/external/'
 a, b = path(root)
-
+new_shape = (350, 600)
 small = []
 
 for i in range (len(a)): 
@@ -220,10 +220,14 @@ for i in range (len(a)):
         
             roi_exp = np.multiply(roi_nor, roi_nor)
             print ('step %s.10' %i)
-            plt.imshow(roi_exp)
-            plt.show()
             
-            save ('D:/np_ext/%s.npy' %i, roi_exp)
+            shape_diff = np.array(new_shape) - np.array(roi_exp.shape)
+            new_roi_exp = np.lib.pad(roi_exp, ((0,shape_diff[0]),(0,shape_diff[1])), 
+                              'constant', constant_values=(0))
+
+            plt.imshow(new_roi_exp, cmap="gray")
+            plt.axis('off')
+            plt.savefig('D:/ext/%s' %a[i][12:20] + '_%s.png' %i, bbox_inches='tight',pad_inches = 0)
 
             print ('FINAL STEPPPPP of %s' %i)
 print (small)
