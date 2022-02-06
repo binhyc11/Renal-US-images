@@ -6,7 +6,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.applications.vgg19 import VGG19
 import wandb
 from wandb.keras import WandbCallback
-
+from keras.callbacks import ModelCheckpoint
 
 wandb.init (project = "RenalUS", entity="binhyc11")
 model_callback = ModelCheckpoint (filepath='D:/model/2_layers.h5', save_weights_only=False,
