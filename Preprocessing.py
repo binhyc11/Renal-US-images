@@ -59,8 +59,8 @@ def delete_markers(ROI):  # return roi without markers
     '''
     num, total = overview(ROI)
     mean = total/num
-    for i in range(600):
-        for j in range(800):
+    for i in range(ROI.shape[0]):
+        for j in range(ROI.shape[1]):
             if ROI[i][j] >= 230:
                 ROI[i][j] = mean
     return ROI
