@@ -18,9 +18,10 @@ def path(directory):  # return dcm_list, nrrd_list
             if file_ext == '.nrrd':
                 path_nrrd = directory + ID + '/' + file
                 name_dcm = f_name[0] + '.dcm'
-                path_dcm = directory  + ID + '/' + name_dcm
-                nrrd_list.append(path_nrrd)
-                dcm_list.append(path_dcm)
+                if name_dcm in files:
+                    path_dcm = directory  + ID + '/' + name_dcm
+                    nrrd_list.append(path_nrrd)
+                    dcm_list.append(path_dcm)
     return dcm_list, nrrd_list
 
 def segmentation(path_dcm, path_nrrd):  # return ROI, mask_array
