@@ -10,7 +10,7 @@ def prediction (path, model):
     
     images = np.vstack([x])
     classes = model.predict(images)
-    return (classes[0][0])
+    return (classes)
 
     
 model = load_model("D:/Conv_32x9+64x7_best.h5")
