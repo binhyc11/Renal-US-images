@@ -10,10 +10,10 @@ def prediction (path, model):
     
     images = np.vstack([x])
     classes = model.predict(images)
-    return (classes)
+    return (classes[0])
 
     
-model = load_model("D:/Conv_32x9+64x7_best.h5")
+model = load_model("D:/Con9x64_best.h5")
 model.compile (loss='binary_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
@@ -37,3 +37,21 @@ with open ('C:/Users/binhy/Desktop/patients.csv', 'w', encoding='UTF8', newline=
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(result)
+    
+TP, FN, FP, TN = 0,  0, 0 , 0
+for i in result:
+    
+    pred = ('5' if result[0][1][0][0] > 0.5 else '6')
+    
+    if i[0][0] == '5' and int(i[1][0][0]) > 0.5:
+        TP += 1
+    if i[0][0] == '6' and int(i[1][0][0]) > 0.5:
+        FP += 1
+    if i[0][0] == '5' and int(i[1][0][0]) < 0.5:
+        FN += 1
+    if i[0][0] == '6' and int(i[1][0][0]) < 0.5:
+        TN += 1
+acc = (TP +TN) / (TP + TN +FN + FP)
+pre = TP/ (TP + FP)
+sen = TP/ (TP + FN)
+spe = TN / (TN + FP)
