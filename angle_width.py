@@ -132,7 +132,7 @@ def overview(area):  # return mean_value_pixel
 root = 'D:/renalUS/data/'
 a, b = path(root)
 
-angle = 0
+angle = 5
 degree = []
 angle_width_path =[]
 
@@ -148,7 +148,7 @@ for i in range (len (a)):
     crop_mask = crop (mask, contour_mask)
     width_min = min (crop_mask.shape[0], crop_mask.shape[1])
     
-    best_angle = []
+    best_angle = [[0, crop_mask]]
     
     for k in degree:
         ro = rotate(crop_mask, k, resize=True)
