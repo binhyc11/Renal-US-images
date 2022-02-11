@@ -41,17 +41,17 @@ with open ('C:/Users/binhy/Desktop/patients.csv', 'w', encoding='UTF8', newline=
 TP, FN, FP, TN = 0,  0, 0 , 0
 for i in result:
     
-    pred = ('5' if result[0][1][0][0] > 0.5 else '6')
-    
-    if i[0][0] == '5' and int(i[1][0][0]) > 0.5:
+    if i[0][0] == '5' and int(i[1][0]) > 0.5:
         TP += 1
-    if i[0][0] == '6' and int(i[1][0][0]) > 0.5:
+    if i[0][0] == '6' and int(i[1][0]) > 0.5:
         FP += 1
-    if i[0][0] == '5' and int(i[1][0][0]) < 0.5:
+    if i[0][0] == '5' and int(i[1][0]) < 0.5:
         FN += 1
-    if i[0][0] == '6' and int(i[1][0][0]) < 0.5:
+    if i[0][0] == '6' and int(i[1][0]) < 0.5:
         TN += 1
 acc = (TP +TN) / (TP + TN +FN + FP)
 pre = TP/ (TP + FP)
 sen = TP/ (TP + FN)
 spe = TN / (TN + FP)
+
+print (acc, pre, sen, spe)
