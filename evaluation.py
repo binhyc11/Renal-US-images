@@ -13,7 +13,7 @@ def prediction (path, model):
     return (classes[0])
 
     
-model = load_model("D:/Con9x64_best.h5")
+model = load_model("D:/models/2_layers_original_best.h5")
 model.compile (loss='binary_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
@@ -33,25 +33,45 @@ for i in list_ext:
 
 
 header = ['ID', 'Pred']
-with open ('C:/Users/binhy/Desktop/patients.csv', 'w', encoding='UTF8', newline='') as f:
+with open ('C:/Users/binhy/Desktop/patients2.csv', 'w', encoding='UTF8', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(result)
     
-TP, FN, FP, TN = 0,  0, 0 , 0
-for i in result:
-    
-    if i[0][0] == '5' and int(i[1][0]) > 0.5:
-        TP += 1
-    if i[0][0] == '6' and int(i[1][0]) > 0.5:
-        FP += 1
-    if i[0][0] == '5' and int(i[1][0]) < 0.5:
-        FN += 1
-    if i[0][0] == '6' and int(i[1][0]) < 0.5:
-        TN += 1
+def scores_softmax (result):
+    TP, FN, FP, TN = 0,  0, 0 , 0
+    for i in result:
+        
+        if i[0][0] == '5' and int(i[1][0]) > 0.5:
+            TP += 1
+        if i[0][0] == '6' and int(i[1][0]) > 0.5:
+            FP += 1
+        if i[0][0] == '5' and int(i[1][0]) < 0.5:
+            FN += 1
+        if i[0][0] == '6' and int(i[1][0]) < 0.5:
+            TN += 1
+    return TP, FN, FP, TN
+
+def scores_sigmoid (result):
+    TP, FN, FP, TN = 0,  0, 0 , 0
+    for i in result:
+
+        if i[0][0] == '5':
+            if i[1][0] < 0.5:
+                TP += 1
+            else:
+                FN += 1
+        if i[0][0] == '6':
+            if i[1][0] < 0.5:
+                FP += 1
+            else:
+                TN +=1
+    return TP, FN, FP, TN
+
+TP, FN, FP, TN = scores_sigmoid (result)
+
 acc = (TP +TN) / (TP + TN +FN + FP)
 pre = TP/ (TP + FP)
 sen = TP/ (TP + FN)
 spe = TN / (TN + FP)
-
 print (acc, pre, sen, spe)
