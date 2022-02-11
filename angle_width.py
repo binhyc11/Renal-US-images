@@ -132,7 +132,7 @@ def overview(area):  # return mean_value_pixel
 root = 'D:/renalUS/data/'
 a, b = path(root)
 
-angle = 5
+angle = 0
 degree = []
 angle_width_path =[]
 
@@ -141,25 +141,23 @@ while angle < 181:
     angle += 5
 
 for i in range (len (a)):
-    
+    start = timeit.default_timer()
     _, mask = segmentation (a[i], b[i])
     
     contour_mask = find_contour(mask)
     crop_mask = crop (mask, contour_mask)
-    ori_value,_ = overview(crop_mask)
-    ori_mean = ori_value / (crop_mask.shape[0] * crop_mask.shape[1])
-    max_mean = ori_mean
-    best_angle = []
+    width_min = min (crop_mask.shape[0], crop_mask.shape[1])
     
+    best_angle = []
     
     for k in degree:
         ro = rotate(crop_mask, k, resize=True)
         contour_ro = find_contour(ro)
         crop_ro = crop (ro, contour_ro)
-        ro_value, _ = overview (crop_ro)
-        ro_mean = ori_value/ (crop_ro.shape[0] * crop_ro.shape[1])
+        ro_width = min (crop_ro.shape[0], crop_ro.shape[1])
         
-        if ro_mean > max_mean:
+        if ro_width < width_min:
+            width_min = ro_width
             temp = []
             temp.append (k)
             temp.append(crop_ro)
@@ -173,8 +171,8 @@ for i in range (len (a)):
     
     plt.imshow (best_angle[-1][1])
     plt.show()
-    
-    print ('#############################')
+    stop = timeit.default_timer()
+    print ('FINAL STEPPPPP of %s' %i, 'with time:', stop-start)
 print (len (angle_width_path))
 
 header = ['Angle', 'Width', 'Path']
