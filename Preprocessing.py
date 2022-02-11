@@ -153,7 +153,7 @@ def crop(roi, contour):  # return rectangle contains only roi area
             lower = contour[i][0]
         if contour[i][0] < upper:
             upper = contour[i][0]
-    roi2 = roi2[upper:lower, left:right]
+    roi2 = roi2[(upper-1):(lower+1), (left-1) : (right+1)]
     return roi2
 
 def resizing(roi):  # return roi resized to (350, 600)
