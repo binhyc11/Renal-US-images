@@ -188,3 +188,18 @@ def border_medulla(roi):# return roi for no border, medulla for medulla area
                 if temp > 0 and (temp <= (width * 49 // 400 )):  # 35% of width for medulla
                     medulla[i][j] = 0
     return roi, medulla
+
+
+def stadardization (roi, med):
+    mean_roi = np.mean (roi[roi>0])
+    mean = np.mean (med[med>0])
+    std = np.std (med[med>0])
+    for i in range(roi.shape[0]):
+        for j in range(roi.shape[1]):
+            if roi[i][j] > 230:  ### remove markers
+                roi[i][j] = mean_roi
+            if roi[i][j] > 0:
+                (roi[i][j] - mean)/ std
+    return roi
+              
+        
