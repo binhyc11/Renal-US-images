@@ -7,33 +7,34 @@ def prediction (path, model):
     img = image.load_img(path, target_size=(195, 334))
     x = image.img_to_array(img)
     x = np.expand_dims(x, axis=0)
+    x/= 255.0
     
     images = np.vstack([x])
     classes = model.predict(images)
     return (classes[0])
 
     
-model = load_model("D:/models/2_layers_original_best.h5")
+model = load_model("D:/models/sig_2_layers_original.h5")
 model.compile (loss='binary_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
 
-list_ext = os.listdir('D:/data/ext_VN_complete/')
+list_ext = os.listdir('D:/data/test_exp_com/')
 
 result = []
 
 for i in list_ext:
-    path = 'D:/data/ext_VN_complete/' + str(i)
+    path = 'D:/data/test_exp_com/' + str(i)
     pred = prediction(path, model)
-    print (pred)
+    # print (pred)
     temp = []
     temp.append (i)
-    temp.append (pred)
+    temp.append (pred[0])
     result.append(temp)
 
 
 header = ['ID', 'Pred']
-with open ('C:/Users/binhy/Desktop/patients2.csv', 'w', encoding='UTF8', newline='') as f:
+with open ('C:/Users/binhy/Desktop/patient_5.csv', 'w', encoding='UTF8', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(result)
@@ -42,13 +43,13 @@ def scores_softmax (result):
     TP, FN, FP, TN = 0,  0, 0 , 0
     for i in result:
         
-        if i[0][0] == '5' and int(i[1][0]) > 0.5:
+        if i[0][0] == '5' and int(i[1]) > 0.5:
             TP += 1
-        if i[0][0] == '6' and int(i[1][0]) > 0.5:
+        if i[0][0] == '6' and int(i[1]) > 0.5:
             FP += 1
-        if i[0][0] == '5' and int(i[1][0]) < 0.5:
+        if i[0][0] == '5' and int(i[1]) < 0.5:
             FN += 1
-        if i[0][0] == '6' and int(i[1][0]) < 0.5:
+        if i[0][0] == '6' and int(i[1]) < 0.5:
             TN += 1
     return TP, FN, FP, TN
 
@@ -57,12 +58,12 @@ def scores_sigmoid (result):
     for i in result:
 
         if i[0][0] == '5':
-            if i[1][0] < 0.5:
+            if i[1] < 0.3:
                 TP += 1
             else:
                 FN += 1
         if i[0][0] == '6':
-            if i[1][0] < 0.5:
+            if i[1] < 0.3:
                 FP += 1
             else:
                 TN +=1
