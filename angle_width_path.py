@@ -165,9 +165,12 @@ for i in range (len (a)):
     
     width = min (best_angle[-1][1].shape[0], best_angle[-1][1].shape[1])
     
-    angle_width_path.append (best_angle[-1][0])
-    angle_width_path.append (width)
-    angle_width_path.append (a[i])
+    temp = []
+    temp.append (best_angle[-1][0])
+    temp.append (width)
+    temp.append (a[i])
+    
+    angle_width_path.append (temp)
     
     plt.imshow (best_angle[-1][1])
     plt.show()
