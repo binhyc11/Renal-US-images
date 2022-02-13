@@ -100,7 +100,7 @@ def optimal_rotation (roi):
     contour_mask = find_contour(roi)
     crop_mask = crop (roi, contour_mask)
     width_min = min (crop_mask.shape[0], crop_mask.shape[1])
-    
+
     best_angle = 0
     for k in degree:
         ro = rotate(crop_mask, k, resize=True)
@@ -111,12 +111,18 @@ def optimal_rotation (roi):
         if ro_width < width_min:
             width_min = ro_width
             best_angle = k
-    
-    rotated_roi = rotate(crop_mask, best_angle, resize=True) if best_angle != 0 else crop_mask
-    if rotated_roi.shape[0] > rotated_roi.shape[1]:
-        rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)
+            
+    if best_angle == 0:
+        rotated_roi = crop_mask
+    else:
+        rotated_roi = rotate(crop_mask, best_angle, resize=True)
+        
+        if rotated_roi.shape[0] > rotated_roi.shape[1]:
+            rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)    
+            
         contour_roi = find_contour(rotated_roi)
         rotated_roi = crop (rotated_roi, contour_roi)
+
     return rotated_roi
 
 
@@ -189,19 +195,17 @@ for i in range(len (a)):
     start = timeit.default_timer()
     
     seg = segmentation (a[i], b[i])
-
+    
     ro = optimal_rotation (seg)
-
+    
     resized = resizing (ro)
 
     ex = exp_value (resized)
-
+ 
     ROI, medulla = border_medulla(ex)
-        
+    
     final_roi = stadardization (ROI, medulla) 
-    if i < 5:
-        plt.imshow (final_roi)
-        plt.show()
+
     save ('D:/processed_VN_png/%s' %a[i][18:-4] + '_' + '%s.npy' %i, final_roi)
     
     stop = timeit.default_timer()
