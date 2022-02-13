@@ -1,9 +1,9 @@
-import cv2, pydicom, nrrd, os, timeit, copy, csv
+import cv2, pydicom, nrrd, os, timeit, copy
 import numpy as np
 from PIL import Image
 from numpy import asarray, save
-import matplotlib.pyplot as plt
 from skimage.transform import rotate
+import matplotlib.pyplot as plt
 
 def path(directory):  # return dcm_list, nrrd_list
     '''
@@ -131,7 +131,7 @@ def optimal_rotation (roi):
     crop_mask = crop (roi, contour_mask)
     width_min = min (crop_mask.shape[0], crop_mask.shape[1])
     
-    
+    best_angle = 0
     for k in degree:
         ro = rotate(crop_mask, k, resize=True)
         contour_ro = find_contour(ro)
@@ -142,7 +142,7 @@ def optimal_rotation (roi):
             width_min = ro_width
             best_angle = k
     
-    rotated_roi = rotate(crop_mask, best_angle, resize=True)
+    rotated_roi = rotate(crop_mask, best_angle, resize=True) if best_angle != 0 else crop_mask
     if rotated_roi.shape[0] > rotated_roi.shape[1]:
         rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)
         contour_roi = find_contour(rotated_roi)
@@ -153,7 +153,7 @@ def optimal_rotation (roi):
 def resizing(roi):  # return roi resized to (350, 600)
     roi2 = copy.deepcopy(roi)
     if (roi.shape[0] / roi.shape[1]) < (7/12):
-        dims = (150, (roi.shape[0] * 87) // roi.shape[1])
+        dims = (150, (roi.shape[0] * 150) // roi.shape[1])
     else:
         dims = ((87 * roi.shape[1]) // roi.shape[0], 87)
     roi2 = cv2.resize(roi2, dsize=dims, interpolation=cv2.INTER_NEAREST)
@@ -163,6 +163,9 @@ def resizing(roi):  # return roi resized to (350, 600)
                              'constant', constant_values=(0))
     return new_roi
 
+def exp_value(array_2D):  # return exponential array
+    exp = np.multiply(array_2D, array_2D)
+    return exp
 
 def border_medulla(roi):# return roi for no border, medulla for medulla area
     contour = find_contour(roi)
@@ -171,21 +174,21 @@ def border_medulla(roi):# return roi for no border, medulla for medulla area
     upper = contour[0][0]
     lower = upper
 
-    for i in range(len(contour)):
-        if contour[i][0] > lower:
-            lower = contour[i][0]
-        if contour[i][0] < upper:
-            upper = contour[i][0]
+    for i in contour:
+        if i[0] > lower:
+            lower = i[0]
+        if i[0] < upper:
+            upper = i[0]
             
-    width = (lower - upper +1) **2
+    width_squared = (lower - upper +1) **2
     
     for con in contour:
         for i in range(roi.shape[0]):
             for j in range(roi.shape[1]):
                 temp = (i - con[0])**2 + (j - con[1])**2
-                if temp > 0 and (temp <= (width // 400)):  # 10% of width for cutting border
+                if temp > 0 and (temp <= (width_squared // 400)):  # 10% of width for cutting border
                     roi[i][j] = 0
-                if temp > 0 and (temp <= (width * 49 // 400 )):  # 35% of width for medulla
+                if temp > 0 and (temp <= (width_squared * 49 // 400 )):  # 35% of width for medulla
                     medulla[i][j] = 0
     return roi, medulla
 
@@ -196,10 +199,34 @@ def stadardization (roi, med):
     std = np.std (med[med>0])
     for i in range(roi.shape[0]):
         for j in range(roi.shape[1]):
-            if roi[i][j] > 230:  ### remove markers
+            if roi[i][j] > 230*230:  ### remove markers
                 roi[i][j] = mean_roi
             if roi[i][j] > 0:
                 (roi[i][j] - mean)/ std
     return roi
-              
+
+root = 'D:/renalUS/data/'
+a, b = path(root)
+
+for i in range(len (a)):
+    start = timeit.default_timer()
+    
+    seg = segmentation (a[i], b[i])
+
+    ro = optimal_rotation (seg)
+
+    resized = resizing (ro)
+
+    ex = exp_value (resized)
+
+    ROI, medulla = border_medulla(ex)
         
+    final_roi = stadardization (ROI, medulla) 
+    
+    save ('D:/processed/%s' %a[i][16:24] + '_' + '%s.npy' %i, final_roi)
+    
+    stop = timeit.default_timer()
+    
+    print ('FINAL STEPPPPP of %s' %i, 'with time:', stop-start)
+
+
