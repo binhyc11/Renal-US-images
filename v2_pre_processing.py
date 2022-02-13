@@ -1,9 +1,15 @@
-import cv2, pydicom, nrrd, os, timeit, copy
+import cv2
+import pydicom
+import nrrd
+import os
+import timeit
+import copy
 import numpy as np
 from PIL import Image
 from numpy import asarray, save
 from skimage.transform import rotate
 import matplotlib.pyplot as plt
+
 
 def path(directory):  # return dcm_list, nrrd_list
     '''
@@ -45,11 +51,12 @@ def segmentation(path_dcm, path_nrrd):  # return ROI
 
     # nrrd --> array  --> transposing
     mask_array, _ = nrrd.read(path_nrrd)
-    mask_array = np.reshape(mask_array, (mask_array.shape[0], mask_array.shape[1]))
-    mask_array = np.transpose(mask_array).astype (float)
+    mask_array = np.reshape(
+        mask_array, (mask_array.shape[0], mask_array.shape[1]))
+    mask_array = np.transpose(mask_array).astype(float)
 
     # apply nrrd to dcm in array type
-    ROI = np.multiply(mask_array, array_2D).astype (float)
+    ROI = np.multiply(mask_array, array_2D).astype(float)
 
     return ROI
 
@@ -68,18 +75,18 @@ def find_contour(array):  # return contour of an array
                 loc.append(j)
                 contour.append(loc)
                 break
-        for k in range(array.shape[1]): # run from right to left
+        for k in range(array.shape[1]):  # run from right to left
             loc = []
             if (array[i][array.shape[1] - 1 - k] > 0) and (j != (array.shape[1] - 1 - k)):
                 loc.append(i)
                 loc.append(array.shape[1] - 1 - k)
                 contour.append(loc)
                 break
-            
-    for l in range (array.shape[1]): # run from top to bottom
+
+    for l in range(array.shape[1]):  # run from top to bottom
         for m in range(array.shape[0]):
             loc = []
-            if array [:, l][m] > 0:
+            if array[:, l][m] > 0:
                 loc.append(m)
                 loc.append(l)
                 if loc not in contour:
@@ -87,12 +94,12 @@ def find_contour(array):  # return contour of an array
                 break
         for n in range(array.shape[0]):
             loc = []
-            if array [:, l][array.shape[0] - 1 - n] > 0 and (m != (array.shape[0] - 1 - n)):
+            if array[:, l][array.shape[0] - 1 - n] > 0 and (m != (array.shape[0] - 1 - n)):
                 loc.append(array.shape[0] - 1 - n)
                 loc.append(l)
                 if loc not in contour:
                     contour.append(loc)
-                break           
+                break
     return contour
 
 
@@ -111,42 +118,47 @@ def crop(roi, contour):  # return rectangle contains only roi area
             lower = contour[i][0]
         if contour[i][0] < upper:
             upper = contour[i][0]
-            
+
     start = max(0, upper - 1)
     end = max(0, left - 1)
-    
-    roi2 = roi2[start : (lower+1), end : (right+1)]
+
+    roi2 = roi2[start: (lower+1), end: (right+1)]
     return roi2
 
 
-def optimal_rotation (roi):
+def optimal_rotation(roi):
     angle = 0
     degree = []
 
     while angle < 181:
-        degree.append (angle)
+        degree.append(angle)
         angle += 5
-    
+
     contour_mask = find_contour(roi)
-    crop_mask = crop (roi, contour_mask)
-    width_min = min (crop_mask.shape[0], crop_mask.shape[1])
-    
+    crop_mask = crop(roi, contour_mask)
+    width_min = min(crop_mask.shape[0], crop_mask.shape[1])
+
     best_angle = 0
     for k in degree:
         ro = rotate(crop_mask, k, resize=True)
         contour_ro = find_contour(ro)
-        crop_ro = crop (ro, contour_ro)
-        ro_width = min (crop_ro.shape[0], crop_ro.shape[1])
-                
+        crop_ro = crop(ro, contour_ro)
+        ro_width = min(crop_ro.shape[0], crop_ro.shape[1])
+
         if ro_width < width_min:
             width_min = ro_width
             best_angle = k
-    
-    rotated_roi = rotate(crop_mask, best_angle, resize=True) if best_angle != 0 else crop_mask
-    if rotated_roi.shape[0] > rotated_roi.shape[1]:
-        rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)
+
+    if best_angle == 0:
+        rotated_roi = crop_mask
+    else:
+        rotated_roi = rotate(crop_mask, best_angle, resize=True)
+
+        if rotated_roi.shape[0] > rotated_roi.shape[1]:
+            rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)
+
         contour_roi = find_contour(rotated_roi)
-        rotated_roi = crop (rotated_roi, contour_roi)
+        rotated_roi = crop(rotated_roi, contour_roi)
     return rotated_roi
 
 
@@ -157,20 +169,22 @@ def resizing(roi):  # return roi resized to (350, 600)
     else:
         dims = ((87 * roi.shape[1]) // roi.shape[0], 87)
     roi2 = cv2.resize(roi2, dsize=dims, interpolation=cv2.INTER_NEAREST)
-    
+
     shape_diff = np.array((87, 150)) - np.array(roi2.shape)
-    new_roi = np.lib.pad(roi2, ((0,shape_diff[0]),(0,shape_diff[1])), 
-                             'constant', constant_values=(0))
+    new_roi = np.lib.pad(roi2, ((0, shape_diff[0]), (0, shape_diff[1])),
+                         'constant', constant_values=(0))
     return new_roi
+
 
 def exp_value(array_2D):  # return exponential array
     exp = np.multiply(array_2D, array_2D)
     return exp
 
-def border_medulla(roi):# return roi for no border, medulla for medulla area
+
+def border_medulla(roi):  # return roi for no border, medulla for medulla area
     contour = find_contour(roi)
     medulla = copy.deepcopy(roi)
-    
+
     upper = contour[0][0]
     lower = upper
 
@@ -179,54 +193,57 @@ def border_medulla(roi):# return roi for no border, medulla for medulla area
             lower = i[0]
         if i[0] < upper:
             upper = i[0]
-            
-    width_squared = (lower - upper +1) **2
-    
+
+    width_squared = (lower - upper + 1) ** 2
+
     for con in contour:
         for i in range(roi.shape[0]):
             for j in range(roi.shape[1]):
                 temp = (i - con[0])**2 + (j - con[1])**2
-                if temp > 0 and (temp <= (width_squared // 400)):  # 10% of width for cutting border
+                # 10% of width for cutting border
+                if temp > 0 and (temp <= (width_squared // 400)):
                     roi[i][j] = 0
-                if temp > 0 and (temp <= (width_squared * 49 // 400 )):  # 35% of width for medulla
+                # 35% of width for medulla
+                if temp > 0 and (temp <= (width_squared * 49 // 400)):
                     medulla[i][j] = 0
     return roi, medulla
 
 
-def stadardization (roi, med):
-    mean_roi = np.mean (roi[roi>0])
-    mean = np.mean (med[med>0])
-    std = np.std (med[med>0])
+def stadardization(roi, med):
+    mean_roi = np.mean(roi[roi > 0])
+    mean = np.mean(med[med > 0])
+    std = np.std(med[med > 0])
     for i in range(roi.shape[0]):
         for j in range(roi.shape[1]):
-            if roi[i][j] > 230*230:  ### remove markers
+            if roi[i][j] > 230*230:  # remove markers
                 roi[i][j] = mean_roi
             if roi[i][j] > 0:
-                (roi[i][j] - mean)/ std
+                (roi[i][j] - mean) / std
     return roi
+
 
 root = 'D:/renalUS/data/'
 a, b = path(root)
 
-for i in range(len (a)):
+for i in range(len(a)):
     start = timeit.default_timer()
-    
-    seg = segmentation (a[i], b[i])
 
-    ro = optimal_rotation (seg)
+    seg = segmentation(a[i], b[i])
 
-    resized = resizing (ro)
+    ro = optimal_rotation(seg)
 
-    ex = exp_value (resized)
+    resized = resizing(ro)
+
+    ex = exp_value(resized)
 
     ROI, medulla = border_medulla(ex)
-        
-    final_roi = stadardization (ROI, medulla) 
-    
-    save ('D:/processed/%s' %a[i][16:24] + '_' + '%s.npy' %i, final_roi)
-    
+
+    final_roi = stadardization(ROI, medulla)
+    if i < 10:
+        plt.imshow (final_roi)
+        plt.show()
+    save('D:/processed/%s' % a[i][16:24] + '_' + '%s.npy' % i, final_roi)
+
     stop = timeit.default_timer()
-    
-    print ('FINAL STEPPPPP of %s' %i, 'with time:', stop-start)
 
-
+    print('FINAL STEPPPPP of %s' % i, 'with time:', stop-start)
