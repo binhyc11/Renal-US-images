@@ -212,3 +212,12 @@ for i in range(len (a)):
     
     print ('FINAL STEPPPPP of %s' %i, 'with time:', stop-start)
 
+# VN_com = os.listdir ('D:/ext_VN_complete/')
+# images = os.listdir('D:/labels/')
+
+# for i in VN_com:
+#     for j in images:
+#         if os.path.splitext(i[2:-4])[0] == j[2:-4]:
+#             scr = 'D:/labels/' + j
+#             dst = 'D:/labels_png_VN/%s' %i[0] + '_' + j[:-4] +'.png'
+#             shutil.copyfile (scr, dst)
