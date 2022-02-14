@@ -217,9 +217,8 @@ def stadardization(roi, med):
         for j in range(roi.shape[1]):
             if roi[i][j] > 230*230:  # remove markers
                 roi[i][j] = mean_roi
-            if roi[i][j] > 0:
-                (roi[i][j] - mean) / std
-    return roi
+    roi2 = (roi[i][j] - mean)/ std
+    return roi2
 
 
 root = 'D:/renalUS/data/'
