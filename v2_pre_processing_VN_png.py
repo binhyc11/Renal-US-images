@@ -116,13 +116,15 @@ def optimal_rotation (roi):
         rotated_roi = crop_mask
     else:
         rotated_roi = rotate(crop_mask, best_angle, resize=True)
+        contour_ro = find_contour(rotated_roi)
+        crop_ro = crop (rotated_roi, contour_ro)
         
-        if rotated_roi.shape[0] >= rotated_roi.shape[1]:
+        if crop_ro.shape[0] > crop_ro.shape[1]:
             rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)    
             
         contour_roi = find_contour(rotated_roi)
-        rotated_roi = crop (rotated_roi, contour_roi)
-
+        rotated_roi = crop (rotated_roi, contour_roi)    
+    
     return rotated_roi
 
 
@@ -182,13 +184,14 @@ def stadardization (roi, med):
 
 
 a, b =[], []
-images = os.listdir('D:/images_VN_png/')
+images = os.listdir('D:/images_png_VN/')
 for i in images:
-    a.append ('D:/images_VN_png/' + i)
-    
-labels = os.listdir('D:/labels_VN_png/')
+    a.append ('D:/images_png_VN/' + i)
+bugs = []    
+
+labels = os.listdir('D:/labels_png_VN/')
 for j in labels:
-    b.append ('D:/labels_VN_png/' + j)
+    b.append ('D:/labels_png_VN/' + j)
 
 for i in range(len (a)):
     start = timeit.default_timer()
@@ -199,13 +202,14 @@ for i in range(len (a)):
     
     resized = resizing (ro)
 
-    ex = exp_value (resized)
- 
-    ROI, medulla = border_medulla(ex)
+    ROI, medulla = border_medulla(resized)
     
-    final_roi = stadardization (ROI, medulla) 
-
-    save ('D:/processed_VN_png/%s' %a[i][18:-4] + '_' + '%s.npy' %i, final_roi)
+    if np.mean (medulla) == 0:
+        bugs.append (a[i])
+        print ('goddamn bug over here')
+        
+    save ('D:/Pre-processing/VN_png_roi_medulla_wo_exp_&_std/roi%s' %a[i][18:-4] + '_' + '%s.npy' %i, ROI)
+    save ('D:/Pre-processing/VN_png_roi_medulla_wo_exp_&_std/medulla%s' %a[i][18:-4] + '_' + '%s.npy' %i, medulla)    
     
     stop = timeit.default_timer()
     
