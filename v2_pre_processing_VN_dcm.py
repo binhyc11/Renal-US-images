@@ -215,6 +215,7 @@ def stadardization (roi, med):
 
 root = 'D:/RenalUS_dcm/'
 a, b = path(root)
+bugs = []
 
 for i in range(len (a)):
     start = timeit.default_timer()
@@ -225,16 +226,15 @@ for i in range(len (a)):
     
     resized = resizing (ro)
 
-    ex = exp_value (resized)
- 
-    ROI, medulla = border_medulla(ex)
+    ROI, medulla = border_medulla(resized)
     
-    final_roi = stadardization (ROI, medulla) 
     
-    plt.imshow (final_roi)
-    plt.show()
+    if np.mean (medulla) == 0:
+        bugs.append (a[i])
+        print ('goddamn bug over here')
     
-    save ('D:/processed_VN_dcm/5_%s' %a[i][15:23] + '_' + '%s.npy' %i, final_roi)
+    save ('D:/Pre-processing/VN_dcm_roi_medulla_wo_exp_&_std/roi_5_%s' %a[i][15:23] + '_' + '%s.npy' %i, ROI)
+    save ('D:/Pre-processing/VN_dcm_roi_medulla_wo_exp_&_std/medulla_5_%s' %a[i][15:23] + '_' + '%s.npy' %i, medulla)
     
     stop = timeit.default_timer()
     
