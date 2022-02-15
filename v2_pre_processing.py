@@ -154,7 +154,7 @@ def optimal_rotation(roi):
     else:
         rotated_roi = rotate(crop_mask, best_angle, resize=True)
 
-        if rotated_roi.shape[0] > rotated_roi.shape[1]:
+        if rotated_roi.shape[0] >= rotated_roi.shape[1]:
             rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)
 
         contour_roi = find_contour(rotated_roi)
@@ -223,7 +223,8 @@ def stadardization(roi, med):
 
 root = 'D:/renalUS/data/'
 a, b = path(root)
-
+bugs =[]
+ 
 for i in range(len(a)):
     start = timeit.default_timer()
 
@@ -233,16 +234,15 @@ for i in range(len(a)):
 
     resized = resizing(ro)
 
-    ex = exp_value(resized)
-
-    ROI, medulla = border_medulla(ex)
-
-    final_roi = stadardization(ROI, medulla)
-    if i < 10:
-        plt.imshow (final_roi)
-        plt.show()
-    save('D:/processed/%s' % a[i][16:24] + '_' + '%s.npy' % i, final_roi)
-
+    ROI, medulla = border_medulla(resized)
+    
+    if np.mean (medulla) == 0:
+        bugs.append (a[i])
+        print ('goddamn bug over here')
+    
+    save('D:/Pre-processing/data_roi_medulla_wo_exp_&_std/roi_%s' % a[i][16:24] + '_' + '%s.npy' % i, ROI)
+    save('D:/Pre-processing/data_roi_medulla_wo_exp_&_std/medulla_%s' % a[i][16:24] + '_' + '%s.npy' % i, medulla)
+    
     stop = timeit.default_timer()
 
     print('FINAL STEPPPPP of %s' % i, 'with time:', stop-start)
