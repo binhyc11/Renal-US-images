@@ -153,12 +153,16 @@ def optimal_rotation(roi):
         rotated_roi = crop_mask
     else:
         rotated_roi = rotate(crop_mask, best_angle, resize=True)
-
-        if rotated_roi.shape[0] >= rotated_roi.shape[1]:
-            rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)
-
+        contour_ro = find_contour(rotated_roi)
+        crop_ro = crop (rotated_roi, contour_ro)
+        
+        
+        if crop_ro.shape[0] > crop_ro.shape[1]:
+            rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)    
+            
         contour_roi = find_contour(rotated_roi)
-        rotated_roi = crop(rotated_roi, contour_roi)
+        rotated_roi = crop (rotated_roi, contour_roi)    
+    
     return rotated_roi
 
 
