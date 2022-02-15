@@ -148,7 +148,7 @@ def optimal_rotation (roi):
     else:
         rotated_roi = rotate(crop_mask, best_angle, resize=True)
         
-        if rotated_roi.shape[0] > rotated_roi.shape[1]:
+        if rotated_roi.shape[0] >= rotated_roi.shape[1]:
             rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)    
             
         contour_roi = find_contour(rotated_roi)
