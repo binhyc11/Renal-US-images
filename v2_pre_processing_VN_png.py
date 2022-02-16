@@ -179,7 +179,7 @@ def stadardization (roi, med):
         for j in range(roi.shape[1]):
             if roi[i][j] > 230*230:  ### remove markers
                 roi[i][j] = mean_roi
-    roi2 = (roi[i][j] - mean)/ std
+    roi2 = (roi - mean)/ std
     return roi2
 
 
