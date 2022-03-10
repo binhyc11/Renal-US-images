@@ -154,15 +154,12 @@ def optimal_rotation(roi):
     else:
         rotated_roi = rotate(crop_mask, best_angle, resize=True)
         contour_ro = find_contour(rotated_roi)
-        crop_ro = crop (rotated_roi, contour_ro)
+        rotated_roi = crop (rotated_roi, contour_ro)
         
-        
-        if crop_ro.shape[0] > crop_ro.shape[1]:
+        if rotated_roi.shape[0] > rotated_roi.shape[1]:
             rotated_roi = rotate(crop_mask, best_angle + 90, resize=True)    
-            
             contour_roi = find_contour(rotated_roi)
             rotated_roi = crop (rotated_roi, contour_roi)    
-    
     return rotated_roi
 
 def get_size (ID, L_flag, R_flag):
@@ -176,6 +173,7 @@ def get_size (ID, L_flag, R_flag):
 
 def resizing(roi, length):  # return roi resized to (140, 140)
     roi2 = copy.deepcopy(roi)
+
     dims = (round(length * 10), round(roi2.shape[0] * 10 * length/ roi2.shape[1]) )
     
     roi2 = cv2.resize(roi2, dsize=dims, interpolation=cv2.INTER_NEAREST)
@@ -284,9 +282,9 @@ for i in range(len(a)):
         start = timeit.default_timer()
     
         seg = segmentation(root+a[i], root+b[i])
-    
+      
         ro = optimal_rotation(seg)
-        
+
         length = get_size (ID, L_flag, R_flag)
         
         resized = resizing(ro, length)
@@ -298,7 +296,7 @@ for i in range(len(a)):
         exp_roi = exp_value (SD_roi)
         
         scale_roi = scale (exp_roi)
-        
+
         if i < 50:
             plt.imshow(scale_roi, cmap = 'gray')   #### roi after scale
             plt.axis('off')
@@ -308,9 +306,16 @@ for i in range(len(a)):
             print ('goddamn bug over here')
         if L_flag == True:
             save('D:/v3_preprocessing/' + ID + '_L_' + '%s.npy' % i, scale_roi)
+            plt.imshow(scale_roi, cmap = 'gray')   #### roi after scale
+            plt.axis('off')                  
+            plt.savefig('D:/v3_preprocessing/'+ ID + '_L_' + '%s.png' % i , bbox_inches='tight', pad_inches = 0)
+            plt.close()
         if R_flag == True:
             save('D:/v3_preprocessing/' + ID + '_R_' + '%s.npy' % i, scale_roi)
-        
+            plt.imshow(scale_roi, cmap = 'gray')   #### roi after scale
+            plt.axis('off')                  
+            plt.savefig('D:/v3_preprocessing/'+ ID + '_R_' + '%s.png' % i , bbox_inches='tight', pad_inches = 0)
+            plt.close()
         stop = timeit.default_timer()
     
         print('FINAL STEPPPPP of %s' % i, 'with time:', stop-start)
