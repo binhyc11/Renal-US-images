@@ -84,4 +84,35 @@ val_1_com = combination (val_1_file, val_1_ID)
 
 test_0_com = combination (test_0_file, test_0_ID)
 test_1_com = combination (test_1_file, test_1_ID)
-        
+
+
+for i in range (len(train_0_com)):
+    ID = train_0_com[i][0].split ('_')[0] + '_' + train_0_com[i][0].split ('_')[1] + '_' + str(i) + '.npy'
+    co = np.dstack ( (np.load ('D:/v3_preprocessing/' + train_0_com[i][0]), np.load ('D:/v3_preprocessing/' + train_0_com[i][1])))
+    save ('D:/train/0/' + ID , co)
+    
+for i in range (len(train_1_com)):
+    ID = train_1_com[i][0].split ('_')[0] + '_' + train_1_com[i][0].split ('_')[1] + '_' + str(i) + '.npy'
+    co = np.dstack ( (np.load ('D:/v3_preprocessing/' + train_1_com[i][0]), np.load ('D:/v3_preprocessing/' + train_1_com[i][1])))
+    save ('D:/train/1/' + ID , co)
+    
+for i in range (len(val_0_com)):
+    ID = val_0_com[i][0].split ('_')[0] + '_' + val_0_com[i][0].split ('_')[1] + '_' + str(i) + '.npy'
+    co = np.dstack ( (np.load ('D:/v3_preprocessing/' + val_0_com[i][0]), np.load ('D:/v3_preprocessing/' + val_0_com[i][1])))
+    save ('D:/val/0/' + ID , co)
+
+for i in range (len(val_1_com)):
+    ID = val_1_com[i][0].split ('_')[0] + '_' + val_1_com[i][0].split ('_')[1] + '_' + str(i) + '.npy'
+    co = np.dstack ( (np.load ('D:/v3_preprocessing/' + val_1_com[i][0]), np.load ('D:/v3_preprocessing/' + val_1_com[i][1])))
+    save ('D:/val/1/' + ID , co)
+    
+for i in range (len(test_0_com)):
+    ID = test_0_com[i][0].split ('_')[0] + '_' + test_0_com[i][0].split ('_')[1] + '_' + str(i) + '.npy'
+    co = np.dstack ( (np.load ('D:/v3_preprocessing/' + test_0_com[i][0]), np.load ('D:/v3_preprocessing/' + test_0_com[i][1])))
+    save ('D:/test/0/' + ID , co)
+    
+for i in range (len(test_1_com)):
+    ID = test_1_com[i][0].split ('_')[0] + '_' + test_1_com[i][0].split ('_')[1] + '_' + str(i) + '.npy'
+    co = np.dstack ( (np.load ('D:/v3_preprocessing/' + test_1_com[i][0]), np.load ('D:/v3_preprocessing/' + test_1_com[i][1])))
+    save ('D:/test/1/' + ID , co)
+    
